@@ -54,12 +54,15 @@ def project_onto_surface(x0, f, iso, fgrad, tol=1e-13, maxiter=500):
     x_a = x0.copy()  # After
 
     distance = np.linalg.norm(x_b - x_a)
+    grad = fgrad(x_a)  # Grad of f(x,y,z) - iso is the gradient of f(x, y, z).
+    grad_norm = np.linalg.norm(grad)
     while (distance > tol or counter == 0) and counter < maxiter:
         temp = x_a.copy()
-        grad = fgrad(x_a)  # Grad of f(x,y,z) - iso is the gradient of f(x, y, z).
-        x_a = x_a - (f(x_a) - iso) * grad / np.linalg.norm(grad) ** 2.0  # Newton Step.
+        x_a = x_a - (f(x_a) - iso) * grad / grad_norm ** 2.0  # Newton Step.
         x_b = temp
         distance = np.linalg.norm(x_b - x_a)
+        grad = fgrad(x_a)
+        grad_norm = np.linalg.norm(grad)
         counter += 1
     if counter == maxiter:
         print("distance tol grad", distance, tol, grad)
@@ -89,6 +92,7 @@ def find_random_point_on_isosurface(f, iso_val):
         root_sol = root_scalar(fiso_z, method="brenth", bracket=(l_bnd, u_bnd))
         assert root_sol.converged
         seed = np.array([rand_pt[0], rand_pt[1], root_sol.root])
+    print("Optimal found ", seed)
     assert f(seed) - iso_val < 1e-10
     return seed
 

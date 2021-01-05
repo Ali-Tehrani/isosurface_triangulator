@@ -1,6 +1,6 @@
 import numpy as np
-from mesh._dist import distance_between_point_and_hyperplane
-from mesh.utils import angle_between_vectors
+from ._dist import distance_between_point_and_hyperplane
+from .utils import angle_between_vectors
 
 __all__ = ["Vertex"]
 

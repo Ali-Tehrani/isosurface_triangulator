@@ -4,14 +4,14 @@ from mpl_toolkits.mplot3d import Axes3D
 from octreepy import SimpleOctree
 from sortedcollections import ValueSortedDict
 
-from mesh._vert import Vertex
-from mesh._tri import Triangle
-from mesh._dist import (
+from ._vert import Vertex
+from ._tri import Triangle
+from ._dist import (
     distance_between_point_and_hyperplane,
     distance_vertex_and_edge,
     distance_between_points,
 )
-from mesh.utils import (
+from .utils import (
     find_random_point_on_isosurface,
     project_onto_surface,
     normal_on_surface,
@@ -233,6 +233,7 @@ class VertexTriangles:
     def add_vertex(self, v):
         self._vertices.append(v)
         # self.octree.insert(list(v.coord), v.index)
+        print(v.coord)
         self.octree.InsertPoint(v.coord, v.index)
 
     def add_triangle(self, t):
@@ -350,6 +351,7 @@ class VertexTriangles:
         if return_distance:
             return indices, indices[1:, 0]
         return indices
+
 
     def remove_needle_triangle(self, b, a):
         # b, a are Vertex.
@@ -805,13 +807,13 @@ class IsoSurfaceTriangulator:
             curvature = self._calculate_curvature(p0, self.fgrad(p0), type="max")
             curvature = 1.0 / curvature
             # curvature = delta * min(curvature, 1.5)
-
         # Take a step
         v1 = p0 + delta * curvature * grad1.copy()
         v2 = p0 + grad_rot * delta * curvature / np.linalg.norm(grad_rot)
         v2 = project_onto_surface(v2, self.func, self.isoval, self.fgrad)
 
         v1 = project_onto_surface(v1, self.func, self.isoval, self.fgrad)
+        print("v1, v2projected",  v1, v2)
         seed_vertex = Vertex(p0, 0, normal)
         v1_vertex = Vertex(v1, 1, normal_on_surface(self.fgrad, v1))
         v2_vertex = Vertex(v2, 2, normal_on_surface(self.fgrad, v2))
@@ -1138,7 +1140,6 @@ class IsoSurfaceTriangulator:
             )
             if not_found:
                 # All triangle sets considered overlaped with collisioned triangles.
-                print("Attmept Filling: Overlap")
                 raise AllTriangleSetsOverlapError()
             tri_set = triangle_sets[index]
 
@@ -1318,16 +1319,16 @@ class IsoSurfaceTriangulator:
         # Start the growing phase.
         self.growing_phase(delta)
         print("Finish Growing Phase.")
-        self.plot_surface()
-        self.plot_mesh_angles_ratio()
+        # self.plot_surface()
+        # self.plot_mesh_angles_ratio()
+
         # Start the Filling Phase.
         self.setup_front_points_angles_and_edge_information_to_vertices()
         self.filling_phase()
         print("Finish Filling Phase")
-        self.plot_surface()
-        self.plot_mesh_angles_ratio()
+        # self.plot_surface()
+        # self.plot_mesh_angles_ratio()
         return self.to_array()
-
 
     def laplacian(self):
         pass

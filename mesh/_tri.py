@@ -1,12 +1,12 @@
 import numpy as np
-from mesh._vert import Vertex
-from mesh._collision import (
+from ._vert import Vertex
+from ._collision import (
     is_point_inside_triangle,
     intersect_line_segment_boundary_triangle,
     intersection_line_segment,
 )
-from mesh._dist import distance_vertex_and_edge
-from mesh.utils import project_onto_affine_plane
+from ._dist import distance_vertex_and_edge
+from .utils import project_onto_affine_plane
 
 __all__ = ["Triangle"]
 
@@ -289,3 +289,20 @@ class Triangle():
             if is_overlap3:
                 return True
         return False
+
+    def area(self):
+        r"""
+        Heron's formula.
+        https://math.stackexchange.com/questions/128991/how-to-calculate-the-area-of-a-3d-triangle
+        https://people.eecs.berkeley.edu/~wkahan/Triangle.pdf
+        """
+        v1, v2, v3 = self.get_vertices()
+        p1, p2, p3 = v1.coord, v2.coord, v3.coord
+        # a = np.linalg.norm(p1 - p2)
+        # b = np.linalg.norm(p2 - p3)
+        # c = np.linalg.norm(p3 - p1)
+        # prim = a + b + c
+        # s = prim / 2.0
+        # return np.sqrt(s * (s - a) * (s - b) * (s - c))
+
+        return 0.5 * np.linalg.norm(np.cross(p2 - p1, p3 - p1))
